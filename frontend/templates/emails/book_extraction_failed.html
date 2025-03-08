@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>خطا در استخراج متن</title>
+</head>
+<body>
+    <div style="font-family: Vazir, Tahoma; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2>سلام {{ user.username }} عزیز</h2>
+        <p>متأسفانه در فرآیند استخراج متن کتاب "{{ book.title }}" خطایی رخ داده است.</p>
+        <p>شما می‌توانید با مراجعه به پنل کاربری، فرآیند استخراج متن را مجدداً آغاز کنید.</p>
+        <a href="{{ site_url }}{% url 'books:translate' book.id %}" 
+           style="background-color: #EF4444; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 15px;">
+            تلاش مجدد
+        </a>
+    </div>
+</body>
+</html>

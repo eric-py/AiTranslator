@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{title}}
+{% endblock %}
+
+{% block style %}
+
+{% endblock %}
+
+{% block content %}
+<!-- Main Content -->
+<main class="flex-grow container mx-auto px-4 py-24">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Total Books Stats -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 hover-scale border border-gray-100 dark:border-gray-700">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">کل کتاب‌ها</p>
+                    <h3 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">{{ stats.total_books }}</h3>
+                </div>
+                <div class="bg-blue-100 dark:bg-blue-900 p-3 rounded-lg">
+                    <svg class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center text-sm">
+                <span class="text-green-500">+{{ stats.monthly_books }}</span>
+                <span class="text-gray-600 dark:text-gray-400 mr-2">در این ماه</span>
+            </div>
+        </div>
+
+
+        <!-- Total Pages Stats -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 hover-scale border border-gray-100 dark:border-gray-700">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">صفحات ترجمه شده</p>
+                    <h3 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">{{ stats.total_translated_pages }}</h3>
+                </div>
+                <div class="bg-green-100 dark:bg-green-900 p-3 rounded-lg">
+                    <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center text-sm">
+                <span class="text-green-500">+{{ stats.weekly_pages }}</span>
+                <span class="text-gray-600 dark:text-gray-400 mr-2">در هفته گذشته</span>
+            </div>
+        </div>
+        
+        
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 hover-scale border border-gray-100 dark:border-gray-700"
+            x-data="{ 
+                fileName: '',
+                isUploading: false,
+                progress: 0,
+                uploadUrl: '{% url "books:upload" %}',
+                uploadFile(file) {
+                    if (!file) return;
+                    
+                    this.isUploading = true;
+                    this.progress = 0;
+
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', this.uploadUrl, true);
+                    xhr.setRequestHeader('X-CSRFToken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+                    xhr.upload.onprogress = (e) => {
+                        if (e.lengthComputable) {
+                            this.progress = Math.round((e.loaded / e.total) * 100);
+                        }
+                    };
+
+                    xhr.onload = () => {
+                        if (xhr.status === 200) {
+                            const response = JSON.parse(xhr.responseText);
+                            const toast = document.createElement('div');
+                            toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                            toast.textContent = 'فایل با موفقیت آپلود شد';
+                            document.body.appendChild(toast);
+                            setTimeout(() => {
+                                toast.remove();
+                                window.location.href = response.redirect_url;
+                            }, 2000);
+                        } else {
+                            const toast = document.createElement('div');
+                            toast.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                            toast.textContent = 'خطا در آپلود فایل';
+                            document.body.appendChild(toast);
+                            setTimeout(() => toast.remove(), 3000);
+                        }
+                        this.isUploading = false;
+                        this.fileName = '';
+                        this.$refs.fileInput.value = '';
+                    };
+
+                    xhr.onerror = () => {
+                        const toast = document.createElement('div');
+                        toast.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                        toast.textContent = 'خطا در اتصال به سرور';
+                        document.body.appendChild(toast);
+                        setTimeout(() => toast.remove(), 3000);
+                        this.isUploading = false;
+                    };
+
+                    xhr.send(formData);
+                }
+            }">
+            {% csrf_token %}
+            <form @submit.prevent="uploadFile($refs.fileInput.files[0])" class="space-y-4">
+                <input type="file" class="hidden" x-ref="fileInput" @change="fileName = $event.target.files[0]?.name"
+                    accept=".pdf,.epub">
+
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">آپلود فایل جدید</p>
+                        <h3 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1"
+                            x-text="fileName || 'PDF یا EPUB'"></h3>
+                    </div>
+                    <button type="button" @click="$refs.fileInput.click()" :disabled="isUploading"
+                        class="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 dark:disabled:bg-blue-800 text-white p-3 rounded-lg transition-colors duration-300">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div x-show="fileName && !isUploading" x-transition
+                    class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex items-center justify-between">
+                    <span class="text-sm text-blue-600 dark:text-blue-400" x-text="fileName"></span>
+                    <button type="button" @click="fileName = ''; $refs.fileInput.value = ''"
+                        class="text-red-500 hover:text-red-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <button type="submit" x-show="fileName && !isUploading" :disabled="!fileName || isUploading"
+                    class="w-full bg-green-500 hover:bg-green-600 disabled:bg-green-300 dark:disabled:bg-green-800 text-white py-2 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>ارسال فایل</span>
+                </button>
+
+                <div x-show="isUploading" x-transition class="mt-4">
+                    <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div class="h-full bg-blue-500 transition-all duration-300"
+                            :style="'width: ' + progress + '%'"></div>
+                    </div>
+                    <p class="text-sm text-center text-gray-600 dark:text-gray-400 mt-2" x-text="progress + '%'"></p>
+                    <template x-if="progress === 100">
+                        <p class="text-sm text-center text-green-600 dark:text-green-400 mt-2">آپلود شد! می‌توانید صفحه را رفرش کنید.</p>
+                    </template>
+                </div>
+
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    فرمت‌های پشتیبانی شده: PDF, EPUB
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Recent Translations -->
+    <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 hover-scale border border-gray-100 dark:border-gray-700">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">آخرین ترجمه‌ها</h2>
+
+        <div class="space-y-4">
+            {% if recent_books %}
+            {% for book in recent_books %}
+            <div
+                class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-300">
+                <div class="flex items-center">
+                    {% if book.cover %}
+                    <img src="{{ book.cover.url }}" alt="{{ book.title }}" class="w-16 h-20 rounded-lg object-cover">
+                    {% else %}
+                    <div class="w-16 h-20 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                    </div>
+                    {% endif %}
+                    <div class="mr-4">
+                        <h3 class="font-bold text-gray-900 dark:text-gray-100">{{ book.title }}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ book.get_status_display }}</p>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 mt-2 block">{{ book.created_at|timesince}}</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="{% url 'books:translate' book.id %}"
+                        class="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 p-2 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors duration-300">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                            </path>
+                        </svg>
+                    </a>
+                    {% if book.status == 'completed' %}
+                        <a href="{% url 'books:download' book.id %}"
+                            class="bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 p-2 rounded-lg hover:bg-green-200 dark:hover:bg-green-800 transition-colors duration-300">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                        </a>
+                        <a href="{% url 'books:delete' book.id %}"
+                            class="bg-red-100 text-red-500 hover:text-red-600 dark:text-green-400 p-2 rounded-lg hover:bg-red-200 dark:hover:bg-red-800 transition-colors duration-300">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="text-center py-8">
+                <p class="text-gray-500 dark:text-gray-400">هنوز هیچ کتابی ترجمه نکرده‌اید</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Mobile Menu -->
+    {% include 'partials/mobile_menu.html' %}
+
+</main>
+{% endblock %}

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>استخراج متن با موفقیت انجام شد</title>
+</head>
+<body>
+    <div style="font-family: Vazir, Tahoma; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2>سلام {{ user.username }} عزیز</h2>
+        <p>استخراج متن کتاب "{{ book.title }}" با موفقیت انجام شد و اکنون در صف ترجمه قرار دارد.</p>
+        <p>شما می‌توانید پیشرفت ترجمه را از طریق پنل کاربری خود مشاهده کنید.</p>
+        <a href="{{ site_url }}{% url 'books:translate' book.id %}" 
+           style="background-color: #3B82F6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 15px;">
+            مشاهده کتاب
+        </a>
+    </div>
+</body>
+</html>

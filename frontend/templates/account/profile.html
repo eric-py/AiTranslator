@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}{{title}}{% endblock %}
+
+{% block content %}
+<!-- Main Content -->
+<main class="flex-grow container mx-auto px-6 py-24">
+    <!-- Header Section -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 mb-4">
+            تنظیمات کاربری</h1>
+        <p class="text-gray-600 dark:text-gray-400">مدیریت حساب کاربری و تنظیمات شخصی</p>
+    </div>
+
+    <!-- Load Message -->
+    {% include 'partials/messages.html' %}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Password Change -->
+        <div
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 transform hover:-translate-y-1 transition-all duration-300">
+            <div class="flex items-center mb-6">
+                <div class="p-3 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z">
+                        </path>
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mr-4">تغییر رمز عبور</h2>
+            </div>
+            <form action="{% url 'account:password_change' %}" method="post" class="space-y-6">
+                {% csrf_token %}
+                <div>
+                    <label for="old_password"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">رمز عبور فعلی</label>
+                    <input type="password" id="old_password" name="old_password" required
+                        class="w-full px-3 py-2 border {% if form.old_password.errors %}border-red-500{% else %}border-gray-300{% endif %} rounded-xl shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    {% if form.old_password.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.old_password.errors|join:", " }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label for="new_password1"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">رمز عبور جدید</label>
+                    <input type="password" id="new_password1" name="new_password1" required
+                        class="w-full px-3 py-2 border {% if form.new_password1.errors %}border-red-500{% else %}border-gray-300{% endif %} rounded-xl shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    {% if form.new_password1.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.new_password1.errors|join:", " }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label for="new_password2"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">تکرار رمز عبور
+                        جدید</label>
+                    <input type="password" id="new_password2" name="new_password2" required
+                        class="w-full px-3 py-2 border {% if form.new_password2.errors %}border-red-500{% else %}border-gray-300{% endif %} rounded-xl shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    {% if form.new_password2.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.new_password2.errors|join:", " }}</p>
+                    {% endif %}
+                </div>
+                <button type="submit"
+                    class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                    تغییر رمز عبور
+                </button>
+            </form>
+        </div>
+
+        <!-- Email Change -->
+        <div
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 transform hover:-translate-y-1 transition-all duration-300">
+            <div class="flex items-center mb-6">
+                <div class="p-3 bg-green-100 dark:bg-green-900 rounded-lg">
+                    <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                        </path>
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mr-4">تغییر ایمیل</h2>
+            </div>
+            <form action="{% url 'account:email_change' %}" method="post" class="space-y-6">
+                {% csrf_token %}
+                <div>
+                    <label for="current_email"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ایمیل فعلی</label>
+                    <input type="email" value="{{ user.email }}"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white transition-colors duration-300"
+                        disabled>
+                </div>
+                <div>
+                    <label for="new_email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ایمیل
+                        جدید</label>
+                    <input type="email" id="new_email" name="new_email" required
+                        class="w-full px-3 py-2 border {% if email_form.new_email.errors %}border-red-500{% else %}border-gray-300{% endif %} rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white transition-colors duration-300">
+                    {% if email_form.new_email.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ email_form.new_email.errors|join:", " }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label for="confirm_email"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">تکرار ایمیل جدید</label>
+                    <input type="email" id="confirm_email" name="confirm_email" required
+                        class="w-full px-3 py-2 border {% if email_form.confirm_email.errors %}border-red-500{% else %}border-gray-300{% endif %} rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white transition-colors duration-300">
+                    {% if email_form.confirm_email.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ email_form.confirm_email.errors|join:", " }}</p>
+                    {% endif %}
+                </div>
+                <button type="submit"
+                    class="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white font-bold py-3 px-4 rounded-xl transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
+                    تغییر ایمیل
+                </button>
+            </form>
+        </div>
+
+        <!-- Account Deletion -->
+        <div
+            class="md:col-span-2 bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 transform hover:-translate-y-1 transition-all duration-300">
+            <div class="flex items-center mb-6">
+                <div class="p-3 bg-red-100 dark:bg-red-900 rounded-lg">
+                    <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                        </path>
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mr-4">حذف حساب کاربری</h2>
+            </div>
+            <div class="bg-red-50 dark:bg-red-900/30 rounded-xl p-4 mb-6">
+                <p class="text-red-600 dark:text-red-400">
+                    <span class="font-bold">⚠️ هشدار:</span> حذف حساب کاربری غیرقابل بازگشت است و تمام اطلاعات شما را
+                    پاک خواهد کرد.
+                </p>
+            </div>
+            <form action="{% url 'account:delete_account' %}" method="post" onsubmit="confirmDelete(event)">
+                {% csrf_token %}
+                <button type="submit"
+                    class="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white font-bold py-3 px-4 rounded-xl transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
+                    حذف حساب کاربری
+                </button>
+            </form>
+        </div>
+    </div>
+</main>
+
+<!-- Mobile Bottom Menu -->
+{% include 'partials/mobile_menu.html' %}
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    async function confirmDelete(event) {
+        event.preventDefault(); // Prevent form submission
+
+        const result = await Swal.fire({
+            title: 'آیا مطمئن هستید؟',
+            text: "حذف حساب کاربری غیرقابل بازگشت است و تمام اطلاعات شما پاک خواهد شد.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#EF4444',
+            cancelButtonColor: '#3B82F6',
+            confirmButtonText: 'بله، حذف شود',
+            cancelButtonText: 'انصراف'
+        });
+
+        if (result.isConfirmed) {
+            event.target.submit(); // Submit the form if confirmed
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,30 @@
+<!-- Header -->
+<header class="bg-white bg-opacity-90 dark:bg-gray-800 dark:bg-opacity-90 shadow-lg backdrop-filter backdrop-blur-lg fixed w-full z-10 transition-all duration-300">
+    <nav class="container mx-auto px-6 py-3">
+        <div class="flex justify-between items-center">
+            <div class="text-3xl font-bold text-blue-600 dark:text-blue-400 transition-colors duration-300">
+                <a href="{% url 'home' %}">مترجم هوشمند</a>
+            </div>
+            {% if active == 'home' or active == 'login' or active == 'register' %}
+                <div class="flex items-center space-x-4 space-x-reverse">
+                    <a href="{% url 'account:login' %}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-300">ورود</a>
+                    <a href="{% url 'account:register' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors duration-300">ثبت نام</a>
+                </div>
+            {% else %}
+                <div class="hidden md:flex items-center space-x-4 space-x-reverse">
+                    <a href="{% url 'dashboard:dashboard' %}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-300">داشبورد</a>
+                    <a href="{% url 'books:list' %}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-300">کتاب‌های من</a>
+                    <a href="{% url 'account:profile' %}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-300">پروفایل</a>
+                    <form action="{% url 'account:logout' %}" method="post" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-300">
+                            خروج
+                        </button>
+                    </form>
+                </div>
+                <div></div>
+            {% endif %}
+        </div>
+    </nav>
+</header>
+<!-- End Header -->

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>ترجمه کتاب با موفقیت انجام شد</title>
+</head>
+<body>
+    <div style="font-family: Vazir, Tahoma; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2>سلام {{ user.username }} عزیز</h2>
+        <p>ترجمه کتاب "{{ book.title }}" با موفقیت انجام شد.</p>
+        <p>شما می‌توانید نسخه ترجمه شده کتاب را از طریق پنل کاربری خود دانلود کنید.</p>
+        <a href="{{ site_url }}{% url 'books:translate' book.id %}" 
+           style="background-color: #10B981; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 15px;">
+            دانلود کتاب
+        </a>
+    </div>
+</body>
+</html>

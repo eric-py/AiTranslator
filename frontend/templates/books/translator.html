@@ -1,0 +1,454 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<style>
+    @keyframes shake {
+
+        0%,
+        100% {
+            transform: translateX(0);
+        }
+
+        25% {
+            transform: translateX(-2px);
+        }
+
+        75% {
+            transform: translateX(2px);
+        }
+    }
+
+    .group:hover .group-hover\:shake {
+        animation: shake 0.5s ease-in-out;
+    }
+</style>
+<!-- Main Content -->
+<main class="flex-grow container mx-auto px-4 py-24">
+
+    <!-- Load Message -->
+    {% include 'partials/messages.html' %}
+
+    <!-- Book Controls -->
+    <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-4 sm:p-6 mb-8 border border-gray-100 dark:border-gray-700">
+        <div class="flex flex-col sm:flex-row gap-4 justify-between items-center">
+            <!-- دکمه‌های اصلی -->
+            <div class="flex flex-wrap gap-3 w-full sm:w-auto">
+                <a href="{% url 'books:download' book.id %}"
+                    class="group bg-gradient-to-r from-blue-600 to-blue-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl hover:shadow-lg hover:from-blue-500 hover:to-blue-600 transition-all duration-300 text-sm sm:text-base flex-1 sm:flex-none flex items-center justify-center">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5 inline-block ml-1 sm:ml-2 group-hover:animate-bounce" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    دانلود
+                </a>
+                <!-- <button
+                    class="group bg-gradient-to-r from-green-600 to-green-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl hover:shadow-lg hover:from-green-500 hover:to-green-600 transition-all duration-300 text-sm sm:text-base flex-1 sm:flex-none flex items-center justify-center">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5 inline-block ml-1 sm:ml-2 group-hover:animate-pulse" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                    </svg>
+                    ذخیره تغییرات
+                </button> -->
+
+                <a href="#" onclick="confirmDelete(event, '{% url 'books:delete' book.id %}')"
+                    class="group bg-gradient-to-r from-red-600 to-red-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl hover:shadow-lg hover:from-red-500 hover:to-red-600 transition-all duration-300 text-sm sm:text-base flex-1 sm:flex-none flex items-center justify-center">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5 inline-block ml-1 sm:ml-2 group-hover:shake" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    حذف کتاب
+                </a>
+
+                {% if book.status == 'extraction_failed' or book.status == 'failed' %}
+                <a href="{% url 'books:retry_extraction' book.id %}"
+                    class="group bg-gradient-to-r from-yellow-600 to-yellow-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl hover:shadow-lg hover:from-yellow-500 hover:to-yellow-600 transition-all duration-300 text-sm sm:text-base flex-1 sm:flex-none flex items-center justify-center">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5 inline-block ml-1 sm:ml-2 group-hover:animate-spin" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    تلاش مجدد استخراج
+                </a>
+                {% endif %}
+
+                {% if book.status == 'translation_failed' %}
+                <a href="{% url 'books:retry_translation' book.id %}"
+                    class="group bg-gradient-to-r from-yellow-600 to-yellow-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl hover:shadow-lg hover:from-yellow-500 hover:to-yellow-600 transition-all duration-300 text-sm sm:text-base flex-1 sm:flex-none flex items-center justify-center">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5 inline-block ml-1 sm:ml-2 group-hover:animate-spin" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    تلاش مجدد ترجمه
+                </a>
+                {% endif %}
+
+            </div>
+
+            <!-- Page Number -->
+            <div
+                class="flex items-center bg-gray-50 dark:bg-gray-700 rounded-xl p-2 sm:p-3 w-full sm:w-auto justify-center sm:justify-start">
+                <form method="get" class="flex items-center">
+                    <span class="text-gray-700 dark:text-gray-300 ml-2 text-sm sm:text-base">صفحه:</span>
+                    <input type="number" name="page"
+                        class="w-16 sm:w-20 px-2 sm:px-3 py-1 sm:py-2 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                        value="{{ page_number }}" min="1" max="{{ total_pages }}"
+                        onkeydown="if(event.keyCode === 13) { this.form.submit(); return false; }">
+                    <span class="text-gray-700 dark:text-gray-300 mx-2 text-sm sm:text-base">از</span>
+                    <span class="text-gray-700 dark:text-gray-300 text-sm sm:text-base">{{ total_pages }}</span>
+
+                    <!-- <button type="submit" class="ml-2 p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-all duration-300">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 inline-block mr-1 sm:mr-2 group-hover:translate-x-1 transition-transform"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button> -->
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orginal Text and Translation -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Orginal Text -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 hover-scale border border-gray-100 dark:border-gray-700"
+            x-data="{ view: 'text' }">
+            <div class="flex justify-between items-center mb-6">
+                <h2
+                    class="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent">
+                    متن اصلی</h2>
+                <div class="flex items-center space-x-2 space-x-reverse bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                    <!-- دکمه نمایش متن -->
+                    <button @click="view = 'text'" class="p-2 rounded-lg transition-all duration-300"
+                        :class="view === 'text' ? 'bg-white dark:bg-gray-600 shadow-sm' : 'hover:bg-gray-200 dark:hover:bg-gray-600'">
+                        <svg class="w-5 h-5 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                    <!-- Show Image Button -->
+                    <button @click="view = 'image'" class="p-2 rounded-lg transition-all duration-300"
+                        :class="view === 'image' ? 'bg-white dark:bg-gray-600 shadow-sm' : 'hover:bg-gray-200 dark:hover:bg-gray-600'">
+                        <svg class="w-5 h-5 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </button>
+                    <!-- Copy Button -->
+                    <button class="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-all duration-300"
+                        @click="(() => { 
+                                const text = $refs.textContent.innerText;
+                                navigator.clipboard.writeText(text)
+                                    .then(() => {
+                                        // نمایش پیام موفقیت
+                                        const tooltip = document.createElement('div');
+                                        tooltip.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg text-sm';
+                                        tooltip.textContent = 'متن کپی شد';
+                                        document.body.appendChild(tooltip);
+                                        setTimeout(() => tooltip.remove(), 2000);
+                                    })
+                                    .catch(err => {
+                                        console.error('خطا در کپی متن:', err);
+                                        // نمایش پیام خطا
+                                        const tooltip = document.createElement('div');
+                                        tooltip.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg text-sm';
+                                        tooltip.textContent = 'خطا در کپی متن';
+                                        document.body.appendChild(tooltip);
+                                        setTimeout(() => tooltip.remove(), 2000);
+                                    });
+                            })()">
+                        <svg class="w-5 h-5 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                    </button>
+
+                    <button id="retryExtractionBtn"
+                        onclick="handleRetryExtraction('{% url 'books:retry_page_extraction' book.id page_number %}')"
+                        class="p-2 rounded-lg transition-all duration-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                        title="استخراج مجدد این صفحه">
+                        <svg class="w-5 h-5 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Text Detail -->
+            <div x-show="view === 'text'" x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 transform scale-95"
+                x-transition:enter-end="opacity-100 transform scale-100" class="prose dark:prose-invert max-w-none">
+                <div class="text-lg leading-relaxed whitespace-pre-wrap" x-ref="textContent"
+                    style="direction: {{ current_page.original_direction }};" :class="{
+                        'font-persian': '{{ current_page.original_direction }}' === 'rtl',
+                        'font-english': '{{ current_page.original_direction }}' === 'ltr',
+                        'text-gray-700 dark:text-gray-300': true
+                    }">
+                    {{ current_page.original_text|safe }}
+                </div>
+            </div>
+
+            <!-- Image Detail -->
+            <div x-show="view === 'image'" x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 transform scale-95"
+                x-transition:enter-end="opacity-100 transform scale-100"
+                class="relative aspect-[3/4] w-full rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700"
+                x-effect="if(view === 'image') { isLoading = true }">
+
+                <img x-ref="pageImage"
+                    :src="view === 'image' ? `{% url 'books:page_image' book.id page_number %}` : '#'" alt="تصویر صفحه"
+                    class="w-full h-full object-contain" @load="isLoading = false" @error="isLoading = false">
+
+                <!-- Loading Spinner -->
+                <div class="absolute inset-0 flex items-center justify-center bg-gray-100/80 dark:bg-gray-700/80"
+                    x-show="isLoading">
+                    <svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                        </circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Translation -->
+        <div
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 hover-scale border border-gray-100 dark:border-gray-700">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
+                    {% if book.status == 'processing' %}
+                    در حال پردازش...
+                    {% elif book.status == 'translating' %}
+                    در حال ترجمه...
+                    {% else %}
+                    ترجمه
+                    {% endif %}
+                </h2>
+                <div class="flex items-center space-x-2 space-x-reverse bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                    <button id="retryTranslationBtn"
+                        onclick="handleRetryTranslation('{% url 'books:retry_page_translation' book.id page_number %}')"
+                        class="p-2 rounded-lg transition-all duration-300 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="ترجمه مجدد این صفحه">
+                        <svg class="w-5 h-5 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </button>
+                    <!-- Copy Button -->
+                    <button class="p-2 rounded-lg transition-all duration-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                        @click="(() => { 
+                                const text = $refs.translatedText.innerText;
+                                navigator.clipboard.writeText(text)
+                                    .then(() => {
+                                        const tooltip = document.createElement('div');
+                                        tooltip.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg text-sm';
+                                        tooltip.textContent = 'ترجمه کپی شد';
+                                        document.body.appendChild(tooltip);
+                                        setTimeout(() => tooltip.remove(), 2000);
+                                    })
+                                    .catch(err => {
+                                        console.error('خطا در کپی متن:', err);
+                                        const tooltip = document.createElement('div');
+                                        tooltip.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg text-sm';
+                                        tooltip.textContent = 'خطا در کپی متن';
+                                        document.body.appendChild(tooltip);
+                                        setTimeout(() => tooltip.remove(), 2000);
+                                    });
+                            })">
+                        <svg class="w-5 h-5 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="prose dark:prose-invert max-w-none">
+                <div class="text-lg leading-relaxed whitespace-pre-wrap" x-ref="translatedText"
+                    style="direction: {{ current_page.translated_direction }};" :class="{
+                         'font-persian': '{{ current_page.translated_direction }}' === 'rtl',
+                         'font-english': '{{ current_page.translated_direction }}' === 'ltr',
+                         'text-gray-700 dark:text-gray-300': true
+                     }">
+                    {{ current_page.translated_text|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 border border-gray-100 dark:border-gray-700">
+        <div class="bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-600 to-blue-400 h-full rounded-full transition-all duration-500"
+                style="width: {{ page_progress }}%"></div>
+        </div>
+    </div>
+
+    <!-- Page Number Control -->
+    <div class="flex justify-between items-center mt-8 gap-4">
+
+        <a {% if has_previous %} href="?page={{ previous_page }}" {% endif %}
+            class="group bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 hover:shadow-lg border border-gray-100 dark:border-gray-700">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 inline-block ml-1 sm:ml-2 group-hover:-translate-x-1 transition-transform"
+                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+            صفحه قبل
+        </a>
+
+        <a {% if has_next %} href="?page={{ next_page }}" {% endif %}
+            class="group bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 hover:shadow-lg border border-gray-100 dark:border-gray-700">
+            صفحه بعد
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 inline-block mr-1 sm:mr-2 group-hover:translate-x-1 transition-transform"
+                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </a>
+
+    </div>
+</main>
+
+<!-- Mobile Menu -->
+{% include 'partials/mobile_menu.html' %}
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function loadPageImage() {
+        if ($refs.pageImage) {
+            $refs.pageImage.loading = true;
+        }
+    }
+
+    function handleRetryTranslation(url) {
+        const button = document.getElementById('retryTranslationBtn');
+
+        // Disable button
+        button.disabled = true;
+
+        // Add spinning animation to the icon
+        button.querySelector('svg').classList.add('animate-spin');
+
+        // Send translation request first
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                // After successful request, show loading alert
+                Swal.fire({
+                    title: 'درخواست ترجمه ارسال شد',
+                    text: 'در حال بارگذاری مجدد صفحه...',
+                    icon: 'success',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    timerProgressBar: true,
+                    timer: 30000,
+                    didOpen: () => {
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 30000);
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Show error alert
+                Swal.fire({
+                    title: 'خطا',
+                    text: 'مشکلی در ارسال درخواست پیش آمد',
+                    icon: 'error',
+                    confirmButtonText: 'تلاش مجدد',
+                }).then(() => {
+                    // Re-enable button on error
+                    button.disabled = false;
+                    button.querySelector('svg').classList.remove('animate-spin');
+                });
+            });
+    }
+
+    function confirmDelete(event, deleteUrl) {
+        event.preventDefault();
+
+        Swal.fire({
+            title: 'آیا مطمئن هستید؟',
+            text: 'این عملیات غیرقابل بازگشت است!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'بله، حذف شود',
+            cancelButtonText: 'انصراف'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = deleteUrl;
+            }
+        });
+    }
+
+    function handleRetryExtraction(url) {
+        const button = document.getElementById('retryExtractionBtn');
+
+        // Disable button
+        button.disabled = true;
+
+        // Add spinning animation to the icon
+        button.querySelector('svg').classList.add('animate-spin');
+
+        // Send extraction request
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                // After successful request, show loading alert
+                Swal.fire({
+                    title: 'درخواست استخراج ارسال شد',
+                    text: 'در حال بارگذاری مجدد صفحه...',
+                    icon: 'success',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    timerProgressBar: true,
+                    timer: 30000,
+                    didOpen: () => {
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 30000);
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'خطا',
+                    text: 'مشکلی در ارسال درخواست پیش آمد',
+                    icon: 'error',
+                    confirmButtonText: 'تلاش مجدد'
+                }).then(() => {
+                    button.disabled = false;
+                    button.querySelector('svg').classList.remove('animate-spin');
+                });
+            });
+    }
+</script>
+{% endblock %}

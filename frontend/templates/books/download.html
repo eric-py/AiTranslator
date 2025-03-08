@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<main class="flex-grow container mx-auto px-4 py-24">
+    <div class="max-w-4xl mx-auto">
+        <!-- Book Detail -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 mb-8">
+            <div class="flex items-center gap-6">
+                <img src="{{ book.cover.url }}" alt="کتاب"
+                    class="w-32 h-40 rounded-lg object-cover">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ book.title }}</h1>
+                    <div class="flex items-center mt-4">
+                        <span class="text-sm text-gray-500 dark:text-gray-400">وضعیت ترجمه:</span>
+                        <span
+                            class="mr-2 px-2 py-1 bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 text-sm rounded-lg">تکمیل شده</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Download Options -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Orginal Text -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">متن اصلی</h2>
+                <div class="space-y-4">
+                    <a href="{% url 'books:download_original_docx' book.id %}"
+                        class="w-full flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-purple-100/50 dark:from-purple-900/30 dark:to-purple-800/30 rounded-xl hover:from-purple-100 hover:to-purple-200/50 dark:hover:from-purple-800/40 dark:hover:to-purple-700/40 transition-all duration-300">
+                        <div class="flex items-center">
+                            <svg class="w-8 h-8 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                            <span class="mr-3 font-medium text-gray-900 dark:text-gray-100">Word</span>
+                        </div>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">۱.۸ مگابایت</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Translation -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">ترجمه</h2>
+                <div class="space-y-4">
+                    <a href="{% url 'books:download_translation_docx' book.id %}"
+                        class="w-full flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100/50 dark:from-green-900/30 dark:to-green-800/30 rounded-xl hover:from-green-100 hover:to-green-200/50 dark:hover:from-green-800/40 dark:hover:to-green-700/40 transition-all duration-300">
+                        <div class="flex items-center">
+                            <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                            <span class="mr-3 font-medium text-gray-900 dark:text-gray-100">Word</span>
+                        </div>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">۲.۳ مگابایت</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Download All -->
+            <div class="md:col-span-2 bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">دانلود همزمان</h2>
+                <div class="space-y-4">
+                    <a href="{% url 'books:download_all' book.id %}"
+                        class="w-full flex items-center justify-between p-4 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-800/50 transition-colors duration-300">
+                        <div class="flex items-center">
+                            <svg class="w-8 h-8 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            <span class="mr-3 font-medium text-gray-900 dark:text-gray-100">دانلود هر دو فایل Word</span>
+                        </div>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">۳.۴ مگابایت</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Mobile Menu -->
+{% include 'partials/mobile_menu.html' %}
+
+{% endblock %}

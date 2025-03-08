@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}حذف کتاب{% endblock %}
+
+{% block content %}
+<div class="flex-grow container mx-auto px-4 py-24">
+    <div class="max-w-lg mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">آیا مطمئن هستید؟</h2>
+        
+        <div class="bg-red-50 dark:bg-red-900/30 rounded-lg p-4 mb-6">
+            <p class="text-red-700 dark:text-red-300">
+                شما در حال حذف کتاب "{{ object.title }}" هستید. این عمل غیرقابل بازگشت است.
+            </p>
+        </div>
+
+        <div class="border-t dark:border-gray-700 pt-6">
+            <form method="post" class="flex gap-4">
+                {% csrf_token %}
+                <button type="submit" 
+                    class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition-colors duration-300">
+                    حذف کتاب
+                </button>
+                <a href="{% url 'books:list' %}" 
+                    class="flex-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-center transition-colors duration-300">
+                    انصراف
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Menu -->
+{% include 'partials/mobile_menu.html' %}
+
+{% endblock %}
